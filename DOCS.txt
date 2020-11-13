@@ -1,0 +1,171 @@
+COURSES
+A. https://www.udemy.com/course/sveltejs-the-complete-guide/
+B. https://www.youtube.com/watch?v=90PgFUPIybY&ab_channel=CodingAddict
+C. https://www.youtube.com/watch?v=uk1eM0Yn0UQ&ab_channel=CodingAddict
+D. https://www.youtube.com/watch?v=ujbE0mzX-CU&ab_channel=freeCodeCamp.org
+E. https://www.youtube.com/watch?v=vHHLLJA0b70&ab_channel=SvelteSociety 
+F. https://www.youtube.com/watch?v=0rnG-OlzGSs&ab_channel=SvelteSociety
+G. Routify
+H. https://www.youtube.com/channel/UCg6SQd5jnWo5Y70rZD9SQFA/videos
+
+
+
+A
+1. Getting started
+
+- Svelte is a radical new approach to building user interfaces.
+- Whereas traditional frameworks like React and Vue do the bulk of their work in the browser, 
+Svelte shifts that work into a compile step that happens when you build your app.
+- Instead of using techniques like virtual DOM diffing, Svelte writes code that surgically updates the DOM when the state of your app changes.
+- Svelte is a COMPILER, not a framework
+- You ship less code, than with a framework or library
+
+- Svelte Discord channel
+
+- VSCode extensions: Svelte for VS Code
+
+- svelte npm package is the tool that compiles your code
+- rollup -> watches your JS code, and when you change something it uses svelte to recompile it, and does other optimizations
+- rollup.config.js
+- main.js -> firs JS file that is executed
+
+- npm run dev  -> localhost:5000
+- bundle.js  -> the compiled code svelte generates
+- development mode code it's not fully minified and optimized. it will be way smaller when you build the code for production - npm run build
+- sourcemaps .map files - help with debugging
+
+- export let variable  -> variable can be set from outside of the component
+
+Course outline
+-> Base syntax & core features
+-> Conditionals & loops
+-> Reactivity
+-> Meetups project
+-> Components
+-> Bindings & Forms
+-> Managing data with Stores
+-> Transitions & Animations -> help users understand what changed on the page -> built-in animation
+-> HTTP requests -> communicate with some APIs backend
+-> Sapper -> Routing & SSR
+-> Deploy
+
+
+
+2. Base syntax & core features
+
+-  Inspect -> Right click -> Empty Cache and hard reload
+-  {variable}  - connection established with the variable defined in the script tag (let variable;)
+-  on:click
+-  Reactive varibles - labeled statement  ->  $: upperName = name.toUpperCase()  -> recalculate this whenever 'name' variable changes
+-  Labeled statement is useful when you have multiple places when you use that dynamic variable. Also, keep as much logic in the script tag, 
+and as little logic as possible in the markup
+- $: console.log(variable)
+- By default, Data flow in Svelte is unidirectional
+
+Input
+- on:input={changeName} event      OR    - TWO WAY data binding shortcut  -> bind:value={name}  & NO changeName function needed
+- value={name}
+
+Multiple components
+- css style in the <style></style> is scoped to the component
+- communication via props 
+- export let variable  -> variable that could be set from outside via props
+- self extending properties -> name={name}  <=>  {name}
+
+XSS
+- cross-site scripting attacks
+- when you type html tags inside input elements, Svelte treat them by default as text, not as HTML -> good default behavior
+- attack  like inserting <script></script> inside input elements
+- when you want to ouput context as HTML, be sure to sanitize it 
+- tell Svelte to treat as HTML {@html variable}
+
+
+Dynamic CSS classes based on condition
+a) class={image ? 'thumb' : 'thumb thumb-placeholder'}   OR
+b) class="thumb" class:thumb-placeholder="{!image}"
+
+
+3. Conditionals & Loops
+
+=> if, else, else if   -> {#if something} {:else if otherthing} {/if}    -> https://svelte.dev/tutorial/if-blocks
+=> Output lists with each  -> {#each contacts as contact, index (contact.id)} {:else} {/each}   -> https://svelte.dev/tutorial/each-blocks
+=> (contact.id) is a list key that helps Svelte update correctly   ->  https://svelte.dev/tutorial/keyed-each-blocks
+=> on:click
+=> trim() -> removes whitespaces
+=> slice(1) -> delete first     slice(0,-1) -> delete last
+
+
+4. A closer look to reactivity
+
+=> handling events, updating data
+=> whatever you display in the markup, you need to re-assign a value with = to an variable for the component to update
+=> (the = assignment is the trigger for re-render and update changes to the DOM)
+=> update arrays and objects immutably
+=> event modifiers (sometimes you want an event to trigger once) -> EX: on:click|once = {addContact}  or  on:submit|prevendDefault={handleSubmit}
+=> 5 supported modifiers : once, passive, capture, stopPropagation, preventDefault
+=> Event bubbling: https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#Event_bubbling_and_capture
+=> event bubbling & capturing, stopPropagation, event delegation
+
+5. Course Project - Meetups
+
+=> npx degit sveltejs/template meetups
+=> npm install
+=> npm run dev -> localhost:5000
+
+Different component types
+=> stateful components -> hold data, pass data to child components  -> EX: <App> , <Products> , <Checkout>   -> only few
+=> presentational components -> receive & ouput data, don't modify the data, only output it  -> EX: <Button>, <Modal>, <Card>  -> many
+
+Passing data parent to child components
+=> export let
+=> meetups={meetups}  <=> {meetups}
+
+Add meetup to meetups collection
+=> <input bind:value={title}  /> -> Two way data binding 
+=> meetups.push(newMeetup) DOESN'T WORK -> it's not a trigger for Svelte to re-render 
+=> USE INSTEAD meetups = [...meetups, newMeetup]
+=> event forwarding -> forward event from child to the parent component
+=> custom components => <CustomInput>, <CustomButton>
+
+
+
+6. Diving deeper into Components
+
+=> nesting & communicating between components
+=> event forwarding -> on:click  -> the click event gets forwarded to the parent component
+=> emit custom events  -> import { createEventDispatcher } from 'svelte'
+=> pass data from child to parent via events (event.detail)
+=> spread props & default props  -> {...meetup}
+=> slots  -> like children in React
+=> named & default slots
+=> MODAL component
+=> SLOTS, PROPS & CUSTOM EVENTS -> 3 tools to build powerful &  versatile components
+
+Component Lifecycle
+a) Creation
+=> <script> executes -> basic initialization work
+=> onMount() -> more complex initialization work (ex: data fetching from a server)
+=> onDestroy() -> component is detached from the DOM -> cleanup work
+b) Updates
+=> beforeUpdate() -> Save DOM state before Svelte updates it -> used rarely
+=> afterUpdate() -> manually update DOM after svelte update - scroll position -> used rarely
+=> tick() -> await Svelte DOM update -> used rarely
+
+
+7. Course Project - Components deep dive
+
+=> Modal
+
+
+8. Working with Bindings & Forms validation
+
+=> Two Way binding  -> on:input={setTitle} & value={title}    OR   bind:value={title}
+=> element reference & component reference -> bind:this
+=> no built-in validation
+
+
+9. Course Project - Bindings & Forms
+
+=> validation of TextInputs
+=> validation of overall form
+=> when setting the type of the input dynamically, the bind:value feature is not available
